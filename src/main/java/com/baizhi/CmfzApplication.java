@@ -12,7 +12,4 @@ public class CmfzApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CmfzApplication.class, args);
 	}
-	public void test(){
-		System.out.println("github的第一次修改");
-	}
 }
