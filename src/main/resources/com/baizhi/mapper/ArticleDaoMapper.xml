@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.dao.ArticleDao">
+    <select id="findAllSearch" resultType="Article">
+        SELECT id,title,img,content,create_date AS createDate,publish_date AS publishDate,status,guru_id AS guruId FROM article
+        <where>
+            <if test="searchOper=='eq'">
+                ${searchField} = #{searchString}
+            </if>
+            <if test="searchOper=='ne'">
+                ${searchField} != #{searchString}
+            </if>
+            <if test="searchOper=='cn'">
+                ${searchField} like concat('%',#{searchString},'%')
+            </if>
+        </where>
+        limit #{start},#{rows}
+    </select>
+    <select id="findTotalCountsSearch" resultType="Integer">
+        SELECT count(id) FROM article
+        <where>
+            <if test="searchOper=='eq'">
+                ${searchField} = #{searchString}
+            </if>
+            <if test="searchOper=='ne'">
+                ${searchField} != #{searchString}
+            </if>
+            <if test="searchOper=='cn'">
+                ${searchField} like concat('%',#{searchString},'%')
+            </if>
+        </where>
+    </select>
+</mapper>

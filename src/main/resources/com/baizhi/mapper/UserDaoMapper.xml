@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.dao.UserDao">
+    <select id="findAllSearch" resultType="User">
+        SELECT id,phone,password,salt,status,photo,NAME,nick_name AS nickName,sex,sign,location,rigest_date AS rigestDate,last_login AS lastLogin FROM user
+        <where>
+            <if test="searchOper=='eq'">
+                ${searchField} = #{searchString}
+            </if>
+            <if test="searchOper=='ne'">
+                ${searchField} != #{searchString}
+            </if>
+            <if test="searchOper=='cn'">
+                ${searchField} like concat('%',#{searchString},'%')
+            </if>
+        </where>
+        limit #{start},#{rows}
+    </select>
+    <select id="findTotalCountsSearch" resultType="Integer">
+        SELECT count(id) FROM user
+        <where>
+            <if test="searchOper=='eq'">
+                ${searchField} = #{searchString}
+            </if>
+            <if test="searchOper=='ne'">
+                ${searchField} != #{searchString}
+            </if>
+            <if test="searchOper=='cn'">
+                ${searchField} like concat('%',#{searchString},'%')
+            </if>
+        </where>
+    </select>
+    <select id="findCountManDay" resultType="Integer">
+        select count(id)
+        from user
+        where sex=1
+        and DATE_SUB(NOW(),INTERVAL #{num} DAY) &gt; rigest_date
+    </select>
+    <select id="findCountWomenDay" resultType="Integer">
+        select count(id)
+        from user
+        where sex=2
+        and DATE_SUB(NOW(),INTERVAL #{num} DAY) &gt; rigest_date
+    </select>
+</mapper>
