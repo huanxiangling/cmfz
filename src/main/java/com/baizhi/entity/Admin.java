@@ -6,7 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import javax.persistence.Transient;
 import java.io.Serializable;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,4 +18,6 @@ public class Admin implements Serializable {
     private String id;
     private String username;
     private String password;
+    @Transient
+    private List<Role> roles;
 }

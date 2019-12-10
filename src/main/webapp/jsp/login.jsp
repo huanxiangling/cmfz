@@ -5,7 +5,6 @@
 <head>
     <meta charset="utf-8">
     <title>love</title>
-    <link href="favicon.ico" rel="shortcut icon" />
     <link href="${pageContext.request.contextPath}/boot/css/bootstrap.min.css" rel="stylesheet">
     <script src="${pageContext.request.contextPath}/boot/js/jquery-2.2.1.min.js"></script>
     <script>

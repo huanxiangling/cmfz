@@ -1,3 +1,4 @@
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -40,6 +41,11 @@
                 }
             });
         });
+        function lgout() {
+            $.post('${pageContext.request.contextPath}/admin/loginOut');
+            window.location.href = "${pageContext.request.contextPath}/jsp/login.jsp";
+        }
+
     </script>
 </head>
 <body>
@@ -53,10 +59,10 @@
             <div>
                 <ul class="nav navbar-nav navbar-right">
                     <li>
-                        <a href="#">欢迎${sessionScope.admin}</a>
+                        <a href="#">欢迎:<shiro:principal></shiro:principal></a>
                     </li>
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">退出登录<strong class="caret"></strong></a>
+                        <a href="#" class="dropdown-toggle" onclick="lgout()">退出登录<strong class="caret"></strong></a>
                     </li>
                 </ul>
             </div>
@@ -65,38 +71,60 @@
     <div class="row clearfix">
         <div class="col-md-2 column">
             <div class="panel-group" id="panel-494242" >
+                <%--<shiro:hasRole name="superAdmin">--%>
                 <div class="panel panel-default">
-                    <div class="panel-heading" style="height: 60px">
-                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-494242" href="#panel-element-294894"><h4>用户管理</h4></a>
+                    <div class="panel-heading">
+                        <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-494242"
+                           href="#panel-element-372999">管理员管理</a>
                     </div>
-                    <div id="panel-element-294894" class="panel-collapse collapse">
+
+                    <div id="panel-element-372999" class="panel-collapse collapse">
                         <div class="panel-body">
-                            <a href="javascript:$('#content').load('${pageContext.request.contextPath}/jsp/userlist.jsp')" class="list-group-item" style="border: 0;color: #0000FF">用户列表</a>
-                            <a href="javascript:$('#content').load('${pageContext.request.contextPath}/jsp/echarts.jsp')" class="list-group-item" style="border: 0;color: #0000FF">注册趋势图</a>
-                            <a href="javascript:$('#content').load('${pageContext.request.contextPath}/jsp/map.jsp')" class="list-group-item" style="border: 0;color: #0000FF">地理分布表</a>
+                            <a href="javascript:$('#content').load('${pageContext.request.contextPath}/jsp/admin.jsp')"
+                               class="list-group-item" style="border: 0;color: #0000FF">管理员列表</a>
                         </div>
                     </div>
+
+                </div>
+                <%--</shiro:hasRole>--%>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-494242" href="#panel-element-294894"><h4>用户管理</h4></a>
+                    </div>
+                    <shiro:hasRole name="admin">
+                        <div id="panel-element-294894" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <a href="javascript:$('#content').load('${pageContext.request.contextPath}/jsp/userlist.jsp')" class="list-group-item" style="border: 0;color: #0000FF">用户列表</a>
+                                <a href="javascript:$('#content').load('${pageContext.request.contextPath}/jsp/echarts.jsp')" class="list-group-item" style="border: 0;color: #0000FF">注册趋势图</a>
+                                <a href="javascript:$('#content').load('${pageContext.request.contextPath}/jsp/map.jsp')" class="list-group-item" style="border: 0;color: #0000FF">地理分布表</a>
+                            </div>
+                        </div>
+                    </shiro:hasRole>
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-494242" href="#panel-element-372799">上师管理</a>
                     </div>
-                    <div id="panel-element-372799" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <a href="#" class="list-group-item" style="border: 0;color: #0000FF">上师列表</a>
+                    <shiro:hasPermission name="admin:select">
+                        <div id="panel-element-372799" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <a href="#" class="list-group-item" style="border: 0;color: #0000FF">上师列表</a>
+                            </div>
                         </div>
-                    </div>
+                    </shiro:hasPermission>
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-494242" href="#panel-element-400001">文章管理</a>
                     </div>
-                    <div id="panel-element-400001" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <a href="javascript:$('#content').load('${pageContext.request.contextPath}/jsp/article1.jsp')" class="list-group-item" style="border: 0;color: #0000FF">文章列表</a>
-                            <a href="javascript:$('#content').load('${pageContext.request.contextPath}/jsp/article2.jsp')" class="list-group-item" style="border: 0;color: #0000FF">文章搜索</a>
+                    <shiro:hasPermission name="admin:select">
+                        <div id="panel-element-400001" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <a href="javascript:$('#content').load('${pageContext.request.contextPath}/jsp/article1.jsp')" class="list-group-item" style="border: 0;color: #0000FF">文章列表</a>
+                                <a href="javascript:$('#content').load('${pageContext.request.contextPath}/jsp/article2.jsp')" class="list-group-item" style="border: 0;color: #0000FF">文章搜索</a>
+                            </div>
                         </div>
-                    </div>
+                    </shiro:hasPermission>
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-heading">

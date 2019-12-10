@@ -1,5 +1,7 @@
 package com.baizhi.service;
 
+import com.baizhi.annotation.AddCache;
+import com.baizhi.annotation.DelCache;
 import com.baizhi.annotation.LogAnnotation;
 import com.baizhi.dao.BannerDao;
 import com.baizhi.entity.Banner;
@@ -30,6 +32,7 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Override
+    @AddCache(value = "添加缓存")
     public Map findByCurrentPage(Integer page, Integer rows) {
         HashMap hashMap = new HashMap();
         List<Banner> banners = bannerDao.selectByRowBounds(new Banner(), new RowBounds((page - 1) * rows, rows));
@@ -44,6 +47,7 @@ public class BannerServiceImpl implements BannerService {
 
 
     @Override
+    @AddCache(value = "添加search缓存")
     public Map findAllSearch(String searchField, String searchString, String searchOper, Integer page, Integer rows) {
         HashMap hashMap = new HashMap();
         List<Banner> banners = bannerDao.findAllSearch(searchField, searchString, searchOper, (page - 1) * rows, rows);
@@ -82,6 +86,7 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Override
+    @DelCache(value = "删除缓存")
     public Map deleteList(List<String> list) {
         Map map = new HashMap();
         bannerDao.deleteByIdList(list);
