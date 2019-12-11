@@ -5,16 +5,20 @@
         //表格初始化
         $("#adminTable").jqGrid(
             {
-                url: "${pageContext.request.contextPath}/article/showAllArticles",
+                url: "${pageContext.request.contextPath}/admin/showAllAdmin",
                 datatype: "json",
                 colNames: ['ID', '用户名', '密码', '角色', '状态', '操作'],
                 colModel: [
                     {name: 'id', hidden: true},
-                    {name: 'username', hidden: true},
-                    {name: 'password', align: "center", editable: true, editrules: {required: true}},
+                    {name: 'username', editable: true, align: "center",},
+                    {name: 'password', hidden: true},
                     {
-                        name: 'roles', align: "center", edittype: "checkbox", formatter: function (data) {
-                        return data;
+                        name: 'roles', align: "center", formatter: function (data) {
+                        var a = "";
+                        for (var i = 0; i < data.length; i++) {
+                            a += " " + data[i].name + " ";
+                        }
+                        return a;
                     }, editable: true
                     },
                     {
@@ -28,21 +32,21 @@
                         name: 'doing', search: false,
                         align: "center", editable: true, editoptions: {required: true},
                         formatter: function (cellvalue, options, rowObject) {
-                            return '<a href="#" data-toggle="modal" data-target="#myModal" onclick=\'editRow("' + rowObject.id + '")\' class="btn btn-lg"> <span class="glyphicon glyphicon-th-list"></span></a>'
+                            return '<a href="#" data-toggle="modal" data-target="#myAdminModal" onclick=\'editRow("' + rowObject.id + '")\' class="btn btn-lg"> <span class="glyphicon glyphicon-th-list"></span></a>'
                         }
                     },
 
                 ],
-                rowNum: 10,
+                rowNum: 3,
                 height: 500,
-                rowList: [10, 20, 30],
+                rowList: [1, 3, 5, 10],
                 pager: '#adminPage',
                 mtype: "post",
                 viewrecords: true,
                 styleUI: "Bootstrap",
                 autowidth: true,
                 multiselect: true,
-                editurl: "${pageContext.request.contextPath}/article/change"
+                editurl: "${pageContext.request.contextPath}/admin/change"
             });
         $("#adminTable").jqGrid('navGrid', '#adminPage',
             {
@@ -61,66 +65,70 @@
             },//对搜索时的配置对象
         );
     });
-    //上师信息回显
+    //管理员信息回显
     function editRow(id) {
-        $.post('${pageContext.request.contextPath}/article/findOne', {id: id}, (result) => {
-            $('#title').val(result.title);
-            $.post("${pageContext.request.contextPath}/guru/showGuruList", function (data) {
-                $("#guruList").empty();
-                var option = "<option value='0'>通用文章</option>";
-                data.forEach(function (guru) {
-                    if (result.guruId == guru.id) {
-                        option += "<option selected value='" + guru.id + "'>" + guru.nickName + "</option>"
-                    } else {
-                        option += "<option value='" + guru.id + "'>" + guru.nickName + "</option>"
-                    }
+        $.post('${pageContext.request.contextPath}/admin/findOne', {id: id}, (result) => {
+            $('#username').val(result.username);
+            $('#pwd').val(result.password);
+            $.post("${pageContext.request.contextPath}/admin/findRoles", function (data) {
+                $("#rolelist").empty();
+                data.forEach(function (role) {
+                    var option = "<input type='checkbox' id='" + role.name + "' name='roless' value='" + role.id + "'>" + "<span>" + role.name + "</span>" + "&nbsp;&nbsp;";
+                    $("#rolelist").append(option);
                 });
-                $("#guruList").html(option);
+                var option;
+                result.roles.forEach(function (re) {
+                    $("#" + re.name).prop("checked", true);
+                });
+                $("#rolelist").html(option);
             }, "json");
-            if (result.status == 1) {
-                $('#opt1').attr("selected", true);
+            if (result.status == "正常") {
+                $('#status1').prop("selected", true);
             } else {
-                $('#opt2').attr("selected", true);
+                $('#status2').prop("selected", true);
             }
             KindEditor.html("#editor_id", result.content);
             $('#formid').val(id);
         }, "json");
 
     }
-    function addArticle() {
-        $('#for')[0].reset();
-        KindEditor.html("#editor_id", "");
-        $.post("${pageContext.request.contextPath}/guru/showGuruList", function (data) {
-            $("#guruList").empty();
-            var option = "<option value='0'>通用文章</option>";
-            data.forEach(function (guru) {
-                option += "<option value='" + guru.id + "'>" + guru.nickName + "</option>"
+    function addAdmin() {
+        $('#forAdmin')[0].reset();
+        $.post("${pageContext.request.contextPath}/admin/findRoles", function (data) {
+            $("#rolelist").empty();
+            data.forEach(function (role) {
+                var option = "<input type='checkbox' name='roless' value='" + role.id + "'>" + "<span>" + role.name + "</span>" + "&nbsp;&nbsp;";
+                $("#rolelist").append(option);
             });
-            $("#guruList").html(option);
+
         }, "json");
     }
     function sub() {
-//        alert($("#editor_id").val());
-        $.ajaxFileUpload({
-            url: "${pageContext.request.contextPath}/article/insertArticle",
-            datatype: "json",
-            type: "post",
-            fileElementId: "inputfile",
-            // ajaxFileUpload 不支持序列化数据上传id=111&&title="XXX"
-            //                只支持 Json格式上传数据
-            // 解决方案 : 1.更改 ajaxFileUpload 源码 2. 手动封装Json格式
-            data: {
-                id: $("#formid").val(),
-                status: $('#input4').val(),
-                title: $("#title").val(),
-                guruId: $("#guruList").val(),
-                content: $("#editor_id").val()
-            },
-            success: function (data) {
-                $("#adminTable").trigger('reloadGrid');//刷新表格
-            }
-        });
+        var adminId = $('#formid').val();
+        if (adminId == "") {
+            $.ajax({
+                url: "${pageContext.request.contextPath}/admin/save",
+                datatype: "json",
+                type: "post",
+                data: $("#forAdmin").serialize(),
+                success: function (data) {
+                    $("#adminTable").trigger('reloadGrid');//刷新表格
+                }
+            });
+        } else {
+            $.ajax({
+                url: "${pageContext.request.contextPath}/admin/update",
+                datatype: "json",
+                type: "post",
+                data: $("#forAdmin").serialize(),
+                success: function (data) {
+                    $("#adminTable").trigger('reloadGrid');//刷新表格
+                }
+            });
+        }
+//
     }
+
 </script>
 <!--中心内容-->
 <div id="content">
@@ -133,10 +141,11 @@
                     <div class="tabbable" id="tabs-109847">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a href="#panel-365123" data-toggle="tab">文章列表</a>
+                                <a href="#panel-365123" data-toggle="tab">管理员列表</a>
                             </li>
                             <li>
-                                <a href="#" onclick="addArticle()" data-toggle="modal" data-target="#myModal">添加文章</a>
+                                <a href="#" onclick="addAdmin()" data-toggle="modal"
+                                   data-target="#myAdminModal">添加管理员</a>
                             </li>
                         </ul>
                         <div class="tab-content">
@@ -151,6 +160,56 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- 管理员Modal -->
+<div class="modal fade" id="myAdminModal" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" style="width: 750px">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">管理员信息</h4>
+            </div>
+            <form id="forAdmin" onsubmit="return false" method="post" class="form-horizontal">
+                <input id="formid" type="hidden" name="id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="username" class="col-sm-2 control-label">用户名：</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="username" style="width: 300px" class="form-control" id="username"
+                                   placeholder="请输入用户名">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pwd" class="col-sm-2 control-label">密码：</label>
+                        <div class="col-sm-10">
+                            <input type="password" name="password" style="width: 300px" class="form-control" id="pwd"
+                                   placeholder="请输入密码">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="rolelist" class="col-sm-2 control-label">角色：</label>
+                        <div id="rolelist">
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="statusList" class="col-sm-2 control-label">状态：</label>
+                        <select style="width: 300px" class="form-control" id="statusList" name="status">
+                            <option id="status1" value="正常">正常</option>
+                            <option id="status2" value="冻结">冻结</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+                    <button id="sub2" onclick="sub()" type="submit" class="btn btn-primary" data-dismiss="modal">提交
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

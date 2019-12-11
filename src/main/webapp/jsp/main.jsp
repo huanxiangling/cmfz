@@ -71,7 +71,7 @@
     <div class="row clearfix">
         <div class="col-md-2 column">
             <div class="panel-group" id="panel-494242" >
-                <%--<shiro:hasRole name="superAdmin">--%>
+                <shiro:hasRole name="superAdmin">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-494242"
@@ -86,7 +86,7 @@
                     </div>
 
                 </div>
-                <%--</shiro:hasRole>--%>
+                </shiro:hasRole>
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <a class="panel-title" data-toggle="collapse" data-parent="#panel-494242" href="#panel-element-294894"><h4>用户管理</h4></a>

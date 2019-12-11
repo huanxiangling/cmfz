@@ -4,16 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Transient;
 import java.io.Serializable;
-import java.util.List;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Role implements Serializable {
+@Data
+public class AdminRole implements Serializable {
     private String id;
-    private String name;
-    @Transient
-    private List<Resource> resources;
+    private String adminId;
+    private String roleId;
 }

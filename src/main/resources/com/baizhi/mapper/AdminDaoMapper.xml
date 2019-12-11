@@ -5,6 +5,7 @@
         <id property="id" column="aid"></id>
         <result property="username" column="ausername"></result>
         <result property="password" column="apassword"></result>
+        <result property="status" column="astatus"></result>
         <collection property="roles" ofType="Role">
             <id property="id" column="cid"></id>
             <result property="name" column="cname"></result>
@@ -16,11 +17,71 @@
     </resultMap>
 
     <select id="queryAdminInfo" resultMap="AdminInfo">
-      SELECT a.id aid,a.username ausername,a.password apassword,c.id cid,c.name cname,e.id eid,e.name ename
+        SELECT a.id aid,a.username ausername,a.password apassword,a.status astatus,c.id cid,c.name cname,e.id eid,e.name
+        ename
         FROM admin a
         LEFT JOIN admin_role b ON a.id=b.admin_id
         LEFT JOIN role c ON b.role_id=c.id
         LEFT JOIN role_resource d ON c.id=d.role_id
         LEFT JOIN resource e ON d.resource_id=e.id
+        WHERE a.username=#{username}
+    </select>
+    <select id="findById" resultMap="AdminInfo">
+        SELECT a.id aid,a.username ausername,a.password apassword,a.status astatus,c.id cid,c.name cname,e.id eid,e.name ename
+        FROM admin a
+        LEFT JOIN admin_role b ON a.id=b.admin_id
+        LEFT JOIN role c ON b.role_id=c.id
+        LEFT JOIN role_resource d ON c.id=d.role_id
+        LEFT JOIN resource e ON d.resource_id=e.id
+        WHERE a.id=#{id}
+    </select>
+    <select id="findAll" resultMap="AdminInfo">
+        SELECT a.id aid,a.username ausername,a.password apassword,a.status astatus,c.id cid,c.name cname,e.id eid,e.name ename
+        FROM admin a
+        LEFT JOIN admin_role b ON a.id=b.admin_id
+        LEFT JOIN role c ON b.role_id=c.id
+        LEFT JOIN role_resource d ON c.id=d.role_id
+        LEFT JOIN resource e ON d.resource_id=e.id
+        limit #{start},#{rows}
+    </select>
+    <select id="findAllSearch" resultMap="AdminInfo">
+        SELECT a.id aid,a.username ausername,a.password apassword,a.status astatus,c.id cid,c.name cname,e.id eid,e.name
+        ename
+        FROM admin a
+        LEFT JOIN admin_role b ON a.id=b.admin_id
+        LEFT JOIN role c ON b.role_id=c.id
+        LEFT JOIN role_resource d ON c.id=d.role_id
+        LEFT JOIN resource e ON d.resource_id=e.id
+        <where>
+            <if test="searchOper=='eq'">
+                ${searchField} = #{searchString}
+            </if>
+            <if test="searchOper=='ne'">
+                ${searchField} != #{searchString}
+            </if>
+            <if test="searchOper=='cn'">
+                ${searchField} like concat('%',#{searchString},'%')
+            </if>
+        </where>
+        limit #{start},#{rows}
+    </select>
+    <select id="findTotalCountsSearch" resultType="Integer">
+        SELECT count(a.id)
+        FROM admin a
+        LEFT JOIN admin_role b ON a.id=b.admin_id
+        LEFT JOIN role c ON b.role_id=c.id
+        LEFT JOIN role_resource d ON c.id=d.role_id
+        LEFT JOIN resource e ON d.resource_id=e.id
+        <where>
+            <if test="searchOper=='eq'">
+                ${searchField} = #{searchString}
+            </if>
+            <if test="searchOper=='ne'">
+                ${searchField} != #{searchString}
+            </if>
+            <if test="searchOper=='cn'">
+                ${searchField} like concat('%',#{searchString},'%')
+            </if>
+        </where>
     </select>
 </mapper>
